@@ -12,6 +12,8 @@ import LoginPage from "@/pages/auth/LoginPage"
 import RegisterPage from "@/pages/auth/RegisterPage"
 
 import EditProfilePage from "@/pages/profile/EditProfilePage"
+import RegisterAsSellerPage from "@/pages/seller/RegisterAsSellerPage"
+import BuyerShopPage from "@/pages/shop/BuyerShopPage"
 import MyShopPage from "@/pages/shop/MyShopPage"
 import SettingsPage from "@/pages/settings/SettingsPage"
 import NotificationsPage from "@/pages/notifications/NotificationsPage"
@@ -21,6 +23,8 @@ import SuperAdminDashboard from "@/pages/superadmin/SuperAdminDashboard"
 import SuperAdminPlaceholderPage from "@/pages/superadmin/SuperAdminPlaceholderPage"
 
 import ProtectedRoute from "@/routes/ProtectedRoute"
+import SellerOnlyRoute from "@/routes/SellerOnlyRoute"
+
 import { useAuth } from "@/context/AuthContext"
 
 function PublicOnlyRoute({ children }) {
@@ -59,7 +63,7 @@ export default function App() {
         }
       />
 
-      {/* Main Buyer/Seller Feed - Sidebar + Right Panel */}
+      {/* Main Feed */}
       <Route
         path="/"
         element={
@@ -71,7 +75,31 @@ export default function App() {
         }
       />
 
-      {/* Profile Page - Full Width, No Sidebar */}
+      {/* Buyer Shop Page */}
+      <Route
+        path="/shops"
+        element={
+          <ProtectedRoute allowedRoles={["reviewer"]}>
+            <MenuLayout>
+              <BuyerShopPage />
+            </MenuLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Seller Registration Page */}
+      <Route
+        path="/register-as-seller"
+        element={
+          <ProtectedRoute allowedRoles={["reviewer"]}>
+            <AccountLayout>
+              <RegisterAsSellerPage />
+            </AccountLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Profile Page */}
       <Route
         path="/profile/edit"
         element={
@@ -83,7 +111,7 @@ export default function App() {
         }
       />
 
-      {/* Buyer Pages - Sidebar */}
+      {/* Buyer Pages */}
       <Route
         path="/my-reviews"
         element={
@@ -129,14 +157,16 @@ export default function App() {
         }
       />
 
-      {/* Seller Pages - Sidebar */}
+      {/* Seller Pages */}
       <Route
         path="/my-shop"
         element={
           <ProtectedRoute allowedRoles={["reviewer"]}>
-            <MenuLayout>
-              <MyShopPage />
-            </MenuLayout>
+            <SellerOnlyRoute>
+              <MenuLayout>
+                <MyShopPage />
+              </MenuLayout>
+            </SellerOnlyRoute>
           </ProtectedRoute>
         }
       />
@@ -145,13 +175,15 @@ export default function App() {
         path="/seller/products"
         element={
           <ProtectedRoute allowedRoles={["reviewer"]}>
-            <MenuLayout>
-              <PlaceholderPage
-                title="Seller Products"
-                description="Manage product listings, prices, images, and availability."
-                type="seller"
-              />
-            </MenuLayout>
+            <SellerOnlyRoute>
+              <MenuLayout>
+                <PlaceholderPage
+                  title="Seller Products"
+                  description="Manage product listings, prices, images, and availability."
+                  type="seller"
+                />
+              </MenuLayout>
+            </SellerOnlyRoute>
           </ProtectedRoute>
         }
       />
@@ -160,13 +192,15 @@ export default function App() {
         path="/seller/reviews"
         element={
           <ProtectedRoute allowedRoles={["reviewer"]}>
-            <MenuLayout>
-              <PlaceholderPage
-                title="Customer Reviews"
-                description="Reply to customer reviews and manage shop reputation."
-                type="seller"
-              />
-            </MenuLayout>
+            <SellerOnlyRoute>
+              <MenuLayout>
+                <PlaceholderPage
+                  title="Customer Reviews"
+                  description="Reply to customer reviews and manage shop reputation."
+                  type="seller"
+                />
+              </MenuLayout>
+            </SellerOnlyRoute>
           </ProtectedRoute>
         }
       />
@@ -175,13 +209,15 @@ export default function App() {
         path="/seller/followers"
         element={
           <ProtectedRoute allowedRoles={["reviewer"]}>
-            <MenuLayout>
-              <PlaceholderPage
-                title="Shop Followers"
-                description="View people following your shop and customer engagement."
-                type="seller"
-              />
-            </MenuLayout>
+            <SellerOnlyRoute>
+              <MenuLayout>
+                <PlaceholderPage
+                  title="Shop Followers"
+                  description="View people following your shop and customer engagement."
+                  type="seller"
+                />
+              </MenuLayout>
+            </SellerOnlyRoute>
           </ProtectedRoute>
         }
       />
@@ -190,13 +226,15 @@ export default function App() {
         path="/seller/campaigns"
         element={
           <ProtectedRoute allowedRoles={["reviewer"]}>
-            <MenuLayout>
-              <PlaceholderPage
-                title="Campaign Hub"
-                description="Create offers, shop campaigns, promotions, and announcements."
-                type="seller"
-              />
-            </MenuLayout>
+            <SellerOnlyRoute>
+              <MenuLayout>
+                <PlaceholderPage
+                  title="Campaign Hub"
+                  description="Create offers, shop campaigns, promotions, and announcements."
+                  type="seller"
+                />
+              </MenuLayout>
+            </SellerOnlyRoute>
           </ProtectedRoute>
         }
       />
@@ -205,13 +243,15 @@ export default function App() {
         path="/seller/analytics"
         element={
           <ProtectedRoute allowedRoles={["reviewer"]}>
-            <MenuLayout>
-              <PlaceholderPage
-                title="Shop Analytics"
-                description="Track review growth, product views, followers, and shop performance."
-                type="seller"
-              />
-            </MenuLayout>
+            <SellerOnlyRoute>
+              <MenuLayout>
+                <PlaceholderPage
+                  title="Shop Analytics"
+                  description="Track review growth, product views, followers, and shop performance."
+                  type="seller"
+                />
+              </MenuLayout>
+            </SellerOnlyRoute>
           </ProtectedRoute>
         }
       />

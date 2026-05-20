@@ -1,12 +1,11 @@
 import React from "react"
 import {
   BarChart3,
-  Bell,
-  Building2,
   Megaphone,
   Network,
   Package,
   Settings,
+  ShieldCheck,
   ShoppingBag,
   Star,
   Store,
@@ -15,33 +14,39 @@ import { NavLink } from "react-router-dom"
 
 import { useMode } from "@/context/ModeContext"
 
-const buyerMenus = [
-  {
-    label: "Shop",
-    icon: ShoppingBag,
-    to: "/",
-    activeOnlyHome: true,
-    disabled: false,
-  },
-  {
-    label: "Campaign Hub",
-    icon: Megaphone,
-    to: "#",
-    disabled: true,
-  },
-  {
-    label: "Network",
-    icon: Network,
-    to: "/following",
-    disabled: false,
-  },
-  {
-    label: "Performance Hub",
-    icon: BarChart3,
-    to: "#",
-    disabled: true,
-  },
-]
+const getBuyerMenus = (sellerVerified) =>
+  [
+    {
+      label: "Shop",
+      icon: ShoppingBag,
+      to: "/shops",
+      disabled: false,
+    },
+    !sellerVerified && {
+      label: "Register as Seller",
+      icon: ShieldCheck,
+      to: "/register-as-seller",
+      disabled: false,
+    },
+    {
+      label: "Campaign Hub",
+      icon: Megaphone,
+      to: "#",
+      disabled: true,
+    },
+    {
+      label: "Network",
+      icon: Network,
+      to: "/following",
+      disabled: false,
+    },
+    {
+      label: "Performance Hub",
+      icon: BarChart3,
+      to: "#",
+      disabled: true,
+    },
+  ].filter(Boolean)
 
 const sellerMenus = [
   {
@@ -83,8 +88,20 @@ const sellerMenus = [
 ]
 
 export default function Sidebar() {
-  const { isSeller } = useMode()
-  const menuItems = isSeller ? sellerMenus : buyerMenus
+  const { isSeller, sellerVerified } = useMode()
+  const menuItems = isSeller ? sellerMenus : getBuyerMenus(sellerVerified)
+
+  const ctaTitle = isSeller
+    ? "Grow your shop faster"
+    : sellerVerified
+      ? "Seller account verified"
+      : "Become a verified seller"
+
+  const ctaText = isSeller
+    ? "Manage products, reply to customer reviews, run campaigns, and track shop performance."
+    : sellerVerified
+      ? "You can switch to seller mode anytime from the top menu."
+      : "Submit your shop details, NID documents, and video verification to unlock seller mode."
 
   return (
     <aside className="space-y-4">
@@ -160,19 +177,15 @@ export default function Sidebar() {
           {isSeller ? (
             <Store className="h-5 w-5" />
           ) : (
-            <ShoppingBag className="h-5 w-5" />
+            <ShieldCheck className="h-5 w-5" />
           )}
         </div>
 
         <h3 className="mt-4 text-base font-bold text-slate-950">
-          {isSeller ? "Grow your shop faster" : "Grow your shop reputation"}
+          {ctaTitle}
         </h3>
 
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          {isSeller
-            ? "Manage products, reply to customer reviews, run campaigns, and track shop performance."
-            : "Collect trusted reviews, improve visibility, and build customer confidence."}
-        </p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{ctaText}</p>
       </div>
     </aside>
   )

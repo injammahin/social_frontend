@@ -9,7 +9,7 @@ import {
   MessageSquareText,
   Package,
   Settings,
-  ShoppingBag,
+  ShieldCheck,
   Store,
   UserPen,
   Users,
@@ -37,7 +37,9 @@ import { useAuth } from "@/context/AuthContext"
 import { useMode } from "@/context/ModeContext"
 
 function BuyerSellerToggle() {
-  const { mode, setMode } = useMode()
+  const { mode, setMode, sellerVerified } = useMode()
+
+  if (!sellerVerified) return null
 
   return (
     <div className="hidden items-center rounded-full border border-slate-200 bg-slate-50 p-1 shadow-sm md:flex">
@@ -70,7 +72,7 @@ function BuyerSellerToggle() {
 
 export default function Header() {
   const { user, logout } = useAuth()
-  const { mode, setMode } = useMode()
+  const { mode, setMode, sellerVerified } = useMode()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -79,6 +81,11 @@ export default function Header() {
   }
 
   const buyerDropdownItems = [
+    !sellerVerified && {
+      label: "Register as Seller",
+      to: "/register-as-seller",
+      icon: ShieldCheck,
+    },
     {
       label: "Edit Profile",
       to: "/profile/edit",
@@ -109,7 +116,7 @@ export default function Header() {
       to: "/notifications",
       icon: Bell,
     },
-  ]
+  ].filter(Boolean)
 
   const sellerDropdownItems = [
     {
@@ -145,7 +152,9 @@ export default function Header() {
   ]
 
   const dropdownItems =
-    mode === "seller" ? sellerDropdownItems : buyerDropdownItems
+    mode === "seller" && sellerVerified
+      ? sellerDropdownItems
+      : buyerDropdownItems
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
@@ -179,29 +188,41 @@ export default function Header() {
                   </div>
                 </div>
 
-                <div className="mb-4 grid grid-cols-2 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
-                  <button
-                    type="button"
-                    onClick={() => setMode("buyer")}
-                    className={`h-10 rounded-full text-sm font-bold transition ${mode === "buyer"
-                        ? "bg-[#1dbf73] text-white"
-                        : "text-slate-600"
-                      }`}
-                  >
-                    Buyer
-                  </button>
+                {sellerVerified ? (
+                  <div className="mb-4 grid grid-cols-2 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+                    <button
+                      type="button"
+                      onClick={() => setMode("buyer")}
+                      className={`h-10 rounded-full text-sm font-bold transition ${mode === "buyer"
+                          ? "bg-[#1dbf73] text-white"
+                          : "text-slate-600"
+                        }`}
+                    >
+                      Buyer
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setMode("seller")}
-                    className={`h-10 rounded-full text-sm font-bold transition ${mode === "seller"
-                        ? "bg-[#1dbf73] text-white"
-                        : "text-slate-600"
-                      }`}
+                    <button
+                      type="button"
+                      onClick={() => setMode("seller")}
+                      className={`h-10 rounded-full text-sm font-bold transition ${mode === "seller"
+                          ? "bg-[#1dbf73] text-white"
+                          : "text-slate-600"
+                        }`}
+                    >
+                      Seller
+                    </button>
+                  </div>
+                ) : (
+                  <Button
+                    asChild
+                    className="mb-4 h-11 w-full rounded-2xl bg-[#1dbf73] font-bold text-white hover:bg-[#19a965]"
                   >
-                    Seller
-                  </button>
-                </div>
+                    <Link to="/register-as-seller">
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      Register as Seller
+                    </Link>
+                  </Button>
+                )}
 
                 <Sidebar />
               </SheetContent>
@@ -225,7 +246,19 @@ export default function Header() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          {user && <BuyerSellerToggle />}
+          {user && sellerVerified && <BuyerSellerToggle />}
+
+          {user && !sellerVerified && (
+            <Button
+              asChild
+              className="hidden h-11 rounded-full bg-[#1dbf73] px-5 font-bold text-white shadow-sm hover:bg-[#19a965] md:inline-flex"
+            >
+              <Link to="/register-as-seller">
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Register as Seller
+              </Link>
+            </Button>
+          )}
 
           {!user ? (
             <>
@@ -279,7 +312,9 @@ export default function Header() {
                         {user.fullName}
                       </p>
                       <p className="text-xs text-slate-500">
-                        {mode === "seller" ? "Seller Mode" : "Buyer Mode"}
+                        {mode === "seller" && sellerVerified
+                          ? "Seller Mode"
+                          : "Buyer Mode"}
                       </p>
                     </div>
 
